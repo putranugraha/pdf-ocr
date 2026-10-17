@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#17352c" />
+    <title>Gabungkan PDF - ScanNama</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand-mark">S</div>
+      <div>
+        <h1>Gabungkan PDF</h1>
+        <p>Alat terpisah khusus laptop</p>
+      </div>
+      <a class="topbar-link" href="/">Kembali ke scanner</a>
+    </header>
+
+    <main class="merge-main">
+      <section class="hero merge-hero">
+        <span class="eyebrow">PDF merger lokal</span>
+        <h2>Satukan dua PDF tanpa situs tambahan.</h2>
+        <p>Semua halaman PDF kedua akan ditempatkan setelah halaman terakhir PDF pertama.</p>
+      </section>
+
+      <section class="card merge-card" aria-labelledby="mergeTitle">
+        <div class="section-heading">
+          <span class="step">1</span>
+          <div><h3 id="mergeTitle">PDF pertama</h3><p>Dokumen utama dan acuan nama hasil.</p></div>
+        </div>
+        <label class="pdf-picker">
+          <span>Pilih PDF pertama</span>
+          <input id="primaryPdf" type="file" accept="application/pdf,.pdf" />
+        </label>
+        <p id="primaryName" class="selected-file">Belum ada file dipilih</p>
+        <section id="primaryPreview" class="pdf-preview" aria-label="Pratinjau PDF pertama" hidden>
+          <p class="pdf-preview-message" role="status" aria-live="polite"></p>
+          <div class="pdf-preview-controls">
+            <button type="button" data-action="previous" aria-label="Halaman sebelumnya PDF pertama" disabled>←</button>
+            <label>Halaman <select data-action="page" aria-label="Pilih halaman PDF pertama" disabled></select></label>
+            <span data-role="count"></span>
+            <button type="button" data-action="next" aria-label="Halaman berikutnya PDF pertama" disabled>→</button>
+            <button type="button" data-action="zoom" disabled>Perbesar</button>
+          </div>
+          <button class="pdf-preview-stage" type="button" data-action="enlarge" aria-label="Perbesar pratinjau PDF pertama" disabled hidden>
+            <canvas aria-label="Isi halaman PDF pertama"></canvas>
+          </button>
+          <div class="pdf-rotation-controls">
+            <button type="button" data-action="rotate" aria-pressed="false" disabled>Putar halaman ini 180°</button>
+            <button type="button" data-action="reset-rotation" disabled>Reset semua rotasi</button>
+          </div>
+          <p class="helper" data-role="rotations" aria-live="polite">Belum ada halaman yang diputar.</p>
+          <p class="helper">Pilih halaman, lalu putar jika terbalik. Preview menunjukkan orientasi hasil gabungan.</p>
+        </section>
+
+        <div class="merge-divider" aria-hidden="true">+</div>
+
+        <div class="section-heading">
+          <span class="step">2</span>
+          <div><h3>PDF kedua</h3><p>Semua halamannya ditambahkan di bagian bawah.</p></div>
+        </div>
+        <label class="pdf-picker">
+          <span>Pilih PDF kedua</span>
+          <input id="secondaryPdf" type="file" accept="application/pdf,.pdf" />
+        </label>
+        <p id="secondaryName" class="selected-file">Belum ada file dipilih</p>
+        <section id="secondaryPreview" class="pdf-preview" aria-label="Pratinjau PDF kedua" hidden>
+          <p class="pdf-preview-message" role="status" aria-live="polite"></p>
+          <div class="pdf-preview-controls">
+            <button type="button" data-action="previous" aria-label="Halaman sebelumnya PDF kedua" disabled>←</button>
+            <label>Halaman <select data-action="page" aria-label="Pilih halaman PDF kedua" disabled></select></label>
+            <span data-role="count"></span>
+            <button type="button" data-action="next" aria-label="Halaman berikutnya PDF kedua" disabled>→</button>
+            <button type="button" data-action="zoom" disabled>Perbesar</button>
+          </div>
+          <button class="pdf-preview-stage" type="button" data-action="enlarge" aria-label="Perbesar pratinjau PDF kedua" disabled hidden>
+            <canvas aria-label="Isi halaman PDF kedua"></canvas>
+          </button>
+          <p class="helper">Periksa isi PDF kedua. Semua halamannya akan ditambahkan setelah PDF pertama.</p>
+        </section>
+
+        <div class="merge-divider naming-divider" aria-hidden="true">↓</div>
+
+        <div class="section-heading">
+          <span class="step">3</span>
+          <div><h3>Penamaan otomatis</h3><p>Data dibaca langsung dari PDF kedua setelah dipilih.</p></div>
+        </div>
+        <div id="pdfNamingMessage" class="message" hidden></div>
+
+        <details id="screenshotFallback" class="fallback-panel">
+          <summary>PDF kedua tidak terbaca? Gunakan screenshot</summary>
+          <div class="fallback-content">
+            <label class="pdf-picker naming-picker">
+              <span>Tambah screenshot untuk dibaca OCR</span>
+              <input id="namingImage" type="file" accept="image/*" />
+            </label>
+            <div id="pasteZone" class="paste-zone" tabindex="0" role="button" aria-label="Tempel screenshot dari clipboard">
+              <strong>Atau tempel screenshot langsung</strong>
+              <span>Gunakan Win + Shift + S, lalu tekan Ctrl + V di halaman ini</span>
+            </div>
+            <p id="namingSelection" class="selected-file">Belum ada screenshot</p>
+            <p class="helper">Pastikan Kreditur, Nomor Faktur, Nomor Penerimaan Barang, dan Tanggal Penerimaan Barang terlihat.</p>
+            <div id="namingMessage" class="message" hidden></div>
+          </div>
+        </details>
+
+        <div class="result-box">
+          <label for="resultName">Nama file hasil</label>
+          <input id="resultName" type="text" autocomplete="off" placeholder="Pilih PDF pertama" disabled />
+          <small>Otomatis dibuat dari PDF kedua, tetapi tetap boleh diedit sebelum download.</small>
+        </div>
+
+        <button id="mergeButton" class="share-button" type="button" disabled>Gabungkan &amp; pilih folder</button>
+        <p class="helper save-helper">Chrome/Edge akan meminta lokasi penyimpanan. Browser lain dapat memakai folder Downloads.</p>
+        <button id="clearMergeButton" class="reset-button" type="button">Kosongkan pilihan</button>
+        <div id="mergeMessage" class="message" hidden></div>
+      </section>
+    </main>
+
+    <div id="mergeBusy" class="busy" hidden>
+      <div class="spinner"></div>
+      <p id="mergeBusyText">Sedang menggabungkan PDF…</p>
+    </div>
+    <dialog id="mergePreviewDialog" class="preview-dialog" aria-labelledby="mergePreviewTitle">
+      <div class="preview-shell">
+        <div class="dialog-head preview-head">
+          <div><h3 id="mergePreviewTitle">Pratinjau PDF</h3><p id="mergePreviewDetail"></p></div>
+          <button id="closeMergePreview" class="icon-button" type="button" aria-label="Tutup pratinjau">×</button>
+        </div>
+        <div class="preview-viewport"><canvas id="mergePreviewCanvas"></canvas></div>
+      </div>
+    </dialog>
+    <script src="/merge.js" type="module"></script>
+  </body>
+</html>

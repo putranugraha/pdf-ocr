@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#17352c" />
+    <title>ScanNama PDF</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand-mark">S</div>
+      <div>
+        <h1>ScanNama</h1>
+        <p>Scan rapi, nama otomatis</p>
+      </div>
+      <span id="serverStatus" class="status">Memeriksa…</span>
+      <a class="desktop-link" href="/merge">Gabungkan PDF</a>
+    </header>
+
+    <main>
+      <section class="hero">
+        <span class="eyebrow">PDF scanner lokal</span>
+        <h2>Ubah foto menjadi PDF yang langsung bernama benar.</h2>
+        <p>Crop kertas, bersihkan bayangan, baca nomor pasien dan nomor kunjungan.</p>
+      </section>
+
+      <section class="card tracking-card" aria-labelledby="trackingTitle">
+        <div class="tracking-heading">
+          <div>
+            <span class="eyebrow">Checklist bulanan</span>
+            <h3 id="trackingTitle">Periode <span id="activePeriodLabel">Memuat…</span></h3>
+          </div>
+          <strong id="progressCount" class="progress-count">0 / 1000</strong>
+        </div>
+        <div class="progress-track" aria-hidden="true"><span id="progressBar"></span></div>
+        <p id="progressText" class="helper">Memuat riwayat scan…</p>
+        <div class="tracking-actions">
+          <label>Arsip periode
+            <select id="periodSelect" aria-label="Pilih arsip periode"></select>
+          </label>
+          <button id="openPeriodDialog" class="period-button" type="button">Mulai bulan baru</button>
+        </div>
+        <details id="checklistPanel" class="checklist-panel">
+          <summary>Lihat nomor yang sudah dan belum discan</summary>
+          <div class="checklist-tools">
+            <input id="checklistSearch" inputmode="numeric" autocomplete="off" placeholder="Cari nomor…" aria-label="Cari nomor checklist" />
+            <select id="checklistFilter" aria-label="Filter checklist">
+              <option value="all">Semua nomor</option>
+              <option value="pending">Belum discan</option>
+              <option value="done">Sudah discan</option>
+            </select>
+          </div>
+          <div id="checklistList" class="checklist-list"></div>
+          <p id="checklistEmpty" class="empty-state" hidden>Tidak ada nomor yang cocok.</p>
+        </details>
+        <div id="trackingMessage" class="message" hidden></div>
+      </section>
+
+      <section class="card" aria-labelledby="scanTitle">
+        <div class="section-heading">
+          <span class="step">1</span>
+          <div><h3 id="scanTitle">Halaman PDF</h3><p>Foto langsung di-crop dan angka besar langsung dibaca.</p></div>
+        </div>
+
+        <label class="capture-button primary">
+          <input id="documentInput" type="file" accept="image/*" capture="environment" multiple />
+          <span class="icon">＋</span>
+          Ambil / pilih foto dokumen
+        </label>
+
+        <label class="filter-label scan-filter">Filter otomatis
+          <select id="scanFilterMode">
+            <option value="no_shadow_color">No Shadow — warna</option>
+            <option value="no_shadow_bw">No Shadow — hitam putih</option>
+            <option value="original">Original</option>
+          </select>
+        </label>
+        <p id="recordDetected" class="helper">Foto pertama harus memuat angka besar seperti 697. Nomor dikunci dari foto pertama agar tidak tertimpa halaman lain.</p>
+
+        <div id="emptyPages" class="empty-state">Belum ada halaman</div>
+        <div id="pageList" class="page-list" aria-live="polite"></div>
+      </section>
+
+      <section class="card" aria-labelledby="nameTitle">
+        <div class="section-heading">
+          <span class="step">2</span>
+          <div><h3 id="nameTitle">Foto No. Kunjungan / Resep</h3><p>Foto dekat bagian nomor kunjungan atau nomor resep.</p></div>
+        </div>
+
+        <label class="capture-button secondary">
+          <input id="visitInput" type="file" accept="image/*" capture="environment" multiple />
+          <span class="icon">⌕</span>
+          Foto dekat No. Kunjungan / Resep
+        </label>
+        <p id="visitCount" class="helper">Pastikan label “No Kunjungan” atau “No Resep” beserta angkanya terlihat.</p>
+
+        <button id="ocrButton" class="action-button" type="button">Baca ulang nomor</button>
+
+        <div class="form-grid">
+          <label>Nomor kartu / pasien
+            <input id="recordNumber" inputmode="numeric" autocomplete="off" placeholder="Contoh: 697" />
+          </label>
+          <label>Nomor kunjungan / resep
+            <input id="visitNumber" autocapitalize="characters" autocomplete="off" pattern="[A-Za-z0-9]{19}" minlength="19" aria-describedby="visitLength" placeholder="Contoh: 220208010926Y003452" />
+            <small id="visitLength" class="visit-length" aria-live="polite">0/19 karakter — termasuk huruf dan angka.</small>
+          </label>
+        </div>
+        <div id="duplicateWarning" class="duplicate-warning" hidden></div>
+        <div id="ocrMessage" class="message" hidden></div>
+      </section>
+
+      <section class="card export-card" aria-labelledby="exportTitle">
+        <div class="section-heading">
+          <span class="step">3</span>
+          <div><h3 id="exportTitle">Bagikan PDF</h3><p>Periksa nama sebelum membagikan.</p></div>
+        </div>
+        <div id="filenamePreview" class="filename">—.pdf</div>
+        <div class="export-actions">
+          <button id="shareButton" class="share-button" type="button">Siapkan PDF untuk dibagikan</button>
+        </div>
+        <div id="shareMessage" class="message share-message" hidden></div>
+        <button id="resetButton" class="reset-button" type="button">Kosongkan & scan baru</button>
+      </section>
+    </main>
+
+    <dialog id="cropDialog">
+      <form method="dialog" class="dialog-shell">
+        <div class="dialog-head">
+          <div><h3>Atur crop</h3><p>Geser titik hijau ke sudut kertas.</p></div>
+          <button id="cancelCrop" class="icon-button" value="cancel" aria-label="Tutup">×</button>
+        </div>
+        <div id="canvasWrap" class="canvas-wrap"><canvas id="cropCanvas"></canvas></div>
+        <label class="filter-label">Filter
+          <select id="filterMode">
+            <option value="no_shadow_color">No Shadow — warna</option>
+            <option value="no_shadow_bw">No Shadow — hitam putih</option>
+            <option value="original">Original</option>
+          </select>
+        </label>
+        <div id="cropMessage" class="message" hidden></div>
+        <button id="confirmCrop" class="export-button" type="button">Simpan koreksi crop</button>
+      </form>
+    </dialog>
+
+    <dialog id="previewDialog" class="preview-dialog">
+      <div class="preview-shell">
+        <div class="dialog-head preview-head">
+          <div><h3 id="previewTitle">Preview halaman</h3><p id="previewHint">Ketuk gambar untuk memperbesar.</p></div>
+          <button id="closePreview" class="icon-button" type="button" aria-label="Tutup preview">×</button>
+        </div>
+        <div class="preview-viewport">
+          <img id="previewImage" class="preview-image" alt="Preview hasil scan" />
+        </div>
+      </div>
+    </dialog>
+
+    <dialog id="periodDialog">
+      <form id="periodForm" class="dialog-shell">
+        <div class="dialog-head">
+          <div><h3>Mulai periode bulanan</h3><p>Riwayat periode sebelumnya tetap aman sebagai arsip.</p></div>
+          <button id="closePeriodDialog" class="icon-button" type="button" aria-label="Tutup">×</button>
+        </div>
+        <label class="period-field">Bulan aktif
+          <input id="newPeriod" type="month" required />
+        </label>
+        <label class="period-field">Target jumlah nomor
+          <input id="newPeriodTarget" type="number" min="1" max="100000" value="1000" required />
+        </label>
+        <div id="periodMessage" class="message" hidden></div>
+        <button class="share-button" type="submit">Aktifkan periode ini</button>
+      </form>
+    </dialog>
+
+    <div id="busy" class="busy" hidden><span class="spinner"></span><p>Memproses…</p></div>
+    <script src="/app.js" defer></script>
+  </body>
+</html>
